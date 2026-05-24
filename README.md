@@ -18,14 +18,18 @@ This project demonstrates **distributed systems design**, **event-driven communi
 # System Architecture
 
 ```mermaid
-flowchart LR
+flowchart TB
 
     Client([Client])
 
     Gateway[[API Gateway]]
-    Eureka[(Eureka Discovery)]
+    Eureka[(Eureka Discovery Server)]
 
-    subgraph Core Services
+    Client --> Gateway
+    Gateway --> Eureka
+
+    subgraph Services
+        direction LR
         User[User Service]
         Connection[Connection Service]
         Post[Post Service]
@@ -33,31 +37,33 @@ flowchart LR
         Uploader[Uploader Service]
     end
 
-    Kafka{{Kafka Event Bus}}
-
-    Postgres[(PostgreSQL)]
-    Neo4j[(Neo4j Graph DB)]
-
-    Client --> Gateway
-    Gateway --> Eureka
-
     Gateway --> User
     Gateway --> Connection
     Gateway --> Post
     Gateway --> Notification
     Gateway --> Uploader
 
-    User --> Postgres
-    Post --> Postgres
-    Notification --> Postgres
-
-    Connection --> Neo4j
+    subgraph Messaging
+        Kafka{{Kafka}}
+    end
 
     User --> Kafka
     Connection --> Kafka
     Post --> Kafka
-
     Kafka --> Notification
+
+    subgraph Databases
+        direction LR
+        PG1[(User DB)]
+        PG2[(Post DB)]
+        PG3[(Notification DB)]
+        Neo4j[(Neo4j)]
+    end
+
+    User --> PG1
+    Post --> PG2
+    Notification --> PG3
+    Connection --> Neo4j
 
     Post --> Uploader
 ```
@@ -247,4 +253,4 @@ Start services in order:
 **Ashutosh Sharma**
 
 Java Backend Engineer  
-Spring Boot • Kafka • Microservices • Distributed Systems
+
