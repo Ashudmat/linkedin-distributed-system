@@ -1,0 +1,28 @@
+spring:
+  neo4j:
+    uri: bolt://localhost:7687
+    authentication:
+      username: YOUR_USERNAME
+      password: YOUR_PASSWORD
+
+  application:
+    name: connection-service
+
+  kafka:
+    bootstrap-servers: localhost:9092
+    producer:
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+    consumer:
+      group-id: connection-service
+      auto-offset-reset: earliest
+
+server:
+  port: 9030
+  servlet:
+    context-path: /api/v1/connections
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka

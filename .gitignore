@@ -1,0 +1,23 @@
+# Default ignored files
+/shelf/
+/workspace.xml
+
+# Ignored default folder with query files
+/queries/
+
+/Datasource local storage ignored files
+/dataSources/
+/dataSources.local.xml
+
+# Editor-based HTTP Client requests
+/httpRequests/
+
+# Project ignores
+**/application-local.yml
+application-local.yml
+**/target/
+**/.idea/
+**/*.iml
+.idea/
+.DS_Store
+*.log
