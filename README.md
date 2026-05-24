@@ -18,28 +18,28 @@ This project demonstrates **distributed systems design**, **event-driven communi
 # System Architecture
 
 ```mermaid
-flowchart TB
+flowchart LR
 
-    Client[Client Applications]
+    Client([Client])
 
-    Gateway[API Gateway]
+    Gateway[[API Gateway]]
+    Eureka[(Eureka Discovery)]
 
-    Discovery[Eureka Discovery Server]
+    subgraph Core Services
+        User[User Service]
+        Connection[Connection Service]
+        Post[Post Service]
+        Notification[Notification Service]
+        Uploader[Uploader Service]
+    end
 
-    User[User Service]
-    Connection[Connection Service]
-    Post[Post Service]
-    Notification[Notification Service]
-    Uploader[Uploader Service]
-
-    Kafka[Apache Kafka Event Bus]
+    Kafka{{Kafka Event Bus}}
 
     Postgres[(PostgreSQL)]
-    Neo4j[(Neo4j)]
+    Neo4j[(Neo4j Graph DB)]
 
     Client --> Gateway
-
-    Gateway --> Discovery
+    Gateway --> Eureka
 
     Gateway --> User
     Gateway --> Connection
@@ -58,7 +58,6 @@ flowchart TB
     Post --> Kafka
 
     Kafka --> Notification
-    Kafka --> Connection
 
     Post --> Uploader
 ```
