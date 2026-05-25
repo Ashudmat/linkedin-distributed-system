@@ -8,6 +8,7 @@ import com.codingshuttle.linkedin.post_service.entity.Comment;
 import com.codingshuttle.linkedin.post_service.entity.Post;
 import com.codingshuttle.linkedin.post_service.event.PostCommented;
 import com.codingshuttle.linkedin.post_service.event.PostCreated;
+import com.codingshuttle.linkedin.post_service.exceptions.BadRequestException;
 import com.codingshuttle.linkedin.post_service.exceptions.ResourceNotFoundException;
 import com.codingshuttle.linkedin.post_service.repository.CommentRepository;
 import com.codingshuttle.linkedin.post_service.repository.PostRepository;
@@ -37,26 +38,29 @@ public class PostServiceImpl implements PostService {
     public PostResponseDto createPost(PostRequestDto postRequestDto, MultipartFile file) {
         Long userId = AuthContextHolder.getCurrrentUserId();
         String uploadedUrl = null;
-        if(file != null && !file.isEmpty()){
-            uploadedUrl = uploaderServiceClient.uploadFile(file).getBody();
+        if (file != null && !file.isEmpty()) {
+            uploadedUrl = uploaderServiceClient
+                    .uploadFile(file)
+                    .getBody()
+                    .getData()
+                    .getFileUrl();
         }
         Post post = modelMapper.map(postRequestDto, Post.class);
         post.setUserId(userId);
         post.setMediaUrl(uploadedUrl);
         Post savedPost = postRepository.save(post);
-        List<PersonDto> personDtos =
-                connectionServiceClient.getFirstDegreeConnections(userId);
-        for(PersonDto personDto : personDtos){
+        List<PersonDto> personDtos = connectionServiceClient
+                .getFirstDegreeConnections(userId)
+                .getData();
+
+        for (PersonDto personDto : personDtos) {
             PostCreated postCreated = PostCreated.builder()
                     .postId(savedPost.getId())
                     .authorId(userId)
                     .receiverUserId(personDto.getId())
                     .content(savedPost.getContent())
                     .build();
-            postCreatedKafkaTemplate.send(
-                    "post_created_topic",
-                    postCreated
-            );
+            postCreatedKafkaTemplate.send("post_created_topic", postCreated);
         }
         PostResponseDto dto = modelMapper.map(savedPost, PostResponseDto.class);
         dto.setOwnPost(true);
@@ -66,16 +70,16 @@ public class PostServiceImpl implements PostService {
 
     @Override
     public PostResponseDto getPostById(Long postId) {
-        //Long userId = AuthContextHolder.getCurrrentUserId();
-        Post post = postRepository.findById(postId).orElseThrow(() ->
-                new ResourceNotFoundException("Post not found with id: " + postId));
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Post not found with id: " + postId));
         return modelMapper.map(post, PostResponseDto.class);
     }
 
     @Override
     public List<PostResponseDto> getAllPostsOfUser(Long userId) {
-        List<Post> postList = postRepository.findByUserId(userId);
-        return postList.stream()
+        return postRepository.findByUserId(userId)
+                .stream()
                 .map(post -> modelMapper.map(post, PostResponseDto.class))
                 .toList();
     }
@@ -83,39 +87,49 @@ public class PostServiceImpl implements PostService {
     @Override
     public List<PostResponseDto> getFeed() {
         Long currentUserId = AuthContextHolder.getCurrrentUserId();
-        List<PersonDto> connections = connectionServiceClient.getFirstDegreeConnections(currentUserId);
+        List<PersonDto> connections = connectionServiceClient
+                .getFirstDegreeConnections(currentUserId)
+                .getData();
         List<Long> userIds = connections.stream()
                 .map(PersonDto::getId)
                 .collect(Collectors.toList());
         userIds.add(currentUserId);
-        List<Post> feedPosts = postRepository.findByUserIdInOrderByCreatedAtDesc(userIds);
+        List<Post> feedPosts =
+                postRepository.findByUserIdInOrderByCreatedAtDesc(userIds);
         return feedPosts.stream()
                 .map(post -> {
-                    PostResponseDto dto = modelMapper.map(post, PostResponseDto.class);
-                    boolean isOwnPost = post.getUserId().equals(currentUserId);
+                    PostResponseDto dto =
+                            modelMapper.map(post, PostResponseDto.class);
+                    boolean isOwnPost =
+                            post.getUserId().equals(currentUserId);
                     dto.setOwnPost(isOwnPost);
-                    if(isOwnPost){
+                    if (isOwnPost) {
                         dto.setAuthorName("You");
-                    }
-                    else{
+                    } else {
                         connections.stream()
-                                .filter(person -> person.getId().equals(post.getUserId()))
+                                .filter(person ->
+                                        person.getId().equals(post.getUserId()))
                                 .findFirst()
-                                .ifPresent(person -> dto.setAuthorName(person.getName()));
+                                .ifPresent(person ->
+                                        dto.setAuthorName(person.getName()));
                     }
                     return dto;
-                }).toList();
+                })
+                .toList();
     }
 
     @Override
-    public CommentResponseDto addComment(Long postId, CommentRequestDto requestDto) {
+    public CommentResponseDto addComment(Long postId,
+                                         CommentRequestDto requestDto) {
 
         Long currentUserId = AuthContextHolder.getCurrrentUserId();
         Post post = postRepository.findById(postId)
-                .orElseThrow(() -> new ResourceNotFoundException("Post not found"));
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Post not found"));
 
-        if(requestDto.getContent() == null || requestDto.getContent().trim().isEmpty()){
-            throw new RuntimeException("Comment content cannot be empty");
+        if (requestDto.getContent() == null
+                || requestDto.getContent().trim().isEmpty()) {
+            throw new BadRequestException("Comment content cannot be empty");
         }
         Comment comment = new Comment();
         comment.setPostId(postId);
@@ -131,7 +145,7 @@ public class PostServiceImpl implements PostService {
                 .comment(savedComment.getContent())
                 .build();
 
-        if(!currentUserId.equals(post.getUserId())){
+        if (!currentUserId.equals(post.getUserId())) {
             postCommentedKafkaTemplate.send("post_commented_topic", event);
         }
 
@@ -140,11 +154,14 @@ public class PostServiceImpl implements PostService {
     @Override
     public List<CommentResponseDto> getComments(Long postId) {
         postRepository.findById(postId)
-                .orElseThrow(() -> new ResourceNotFoundException("Post not found with id: " + postId));
+                .orElseThrow(() ->
+                        new ResourceNotFoundException(
+                                "Post not found with id: " + postId));
+
         return commentRepository.findByPostIdOrderByCreatedAtAsc(postId)
                 .stream()
-                .map(comment -> modelMapper.map(comment, CommentResponseDto.class))
+                .map(comment ->
+                        modelMapper.map(comment, CommentResponseDto.class))
                 .toList();
     }
-
 }

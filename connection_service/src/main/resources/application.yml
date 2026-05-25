@@ -2,8 +2,8 @@ spring:
   neo4j:
     uri: bolt://localhost:7687
     authentication:
-      username: YOUR_USERNAME
-      password: YOUR_PASSWORD
+      username: ${DB_USERNAME}
+      password: ${DB_PASSWORD}
 
   application:
     name: connection-service
@@ -16,7 +16,7 @@ spring:
     consumer:
       group-id: connection-service
       auto-offset-reset: earliest
-
+      bootstrap-servers: localhost:9092
 server:
   port: 9030
   servlet:

@@ -1,6 +1,7 @@
 package com.codingshuttle.linkedin.uploader_service.controller;
 
 
+import com.codingshuttle.linkedin.uploader_service.dto.UploadResponseDto;
 import com.codingshuttle.linkedin.uploader_service.service.UploaderService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -20,8 +21,8 @@ public class UploaderController {
     private final UploaderService uploaderService;
 
     @PostMapping
-    public ResponseEntity<String> uploadFile(@RequestParam("file")MultipartFile file) throws IOException {
-        String url = uploaderService.upload(file);
+    public ResponseEntity<UploadResponseDto> uploadFile(@RequestParam("file")MultipartFile file) throws IOException {
+        UploadResponseDto url = uploaderService.upload(file);
         return ResponseEntity.ok(url);
     }
 }

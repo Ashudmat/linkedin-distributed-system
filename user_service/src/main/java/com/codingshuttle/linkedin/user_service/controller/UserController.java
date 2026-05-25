@@ -1,6 +1,7 @@
 package com.codingshuttle.linkedin.user_service.controller;
 
 import com.codingshuttle.linkedin.user_service.dto.LoginRequestDto;
+import com.codingshuttle.linkedin.user_service.dto.LoginResponseDto;
 import com.codingshuttle.linkedin.user_service.dto.SignUpRequestDto;
 import com.codingshuttle.linkedin.user_service.dto.UserResponseDto;
 import com.codingshuttle.linkedin.user_service.security.AuthService;
@@ -24,8 +25,8 @@ public class UserController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<String> login(@RequestBody LoginRequestDto loginRequestDto){
-        String token = authService.login(loginRequestDto);
+    public ResponseEntity<LoginResponseDto> login(@RequestBody LoginRequestDto loginRequestDto){
+        LoginResponseDto token = authService.login(loginRequestDto);
         return ResponseEntity.ok(token);
     }
 }

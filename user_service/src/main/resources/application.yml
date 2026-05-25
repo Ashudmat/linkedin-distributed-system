@@ -1,8 +1,8 @@
 spring:
   datasource:
     url: jdbc:postgresql://localhost:5432/user_db
-    username: YOUR_USERNAME
-    password: YOUR_PASSWORD
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
     driver-class-name: org.postgresql.Driver
 
   application:
@@ -36,4 +36,4 @@ eureka:
     prefer-ip-address: true
 
 jwt:
-  secretKey: YOUR_SECRET_KEY
+  secretKey: ${JWT_SECRET_KEY}

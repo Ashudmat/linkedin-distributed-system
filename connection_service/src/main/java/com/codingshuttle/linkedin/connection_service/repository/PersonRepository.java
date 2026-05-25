@@ -14,7 +14,7 @@ public interface PersonRepository
     MATCH (sender:User {userId: $senderId}),
           (receiver:User {userId: $receiverId})
 
-    CREATE (sender)-[:REQUESTED_CONNECTION]->(receiver)
+    MERGE (sender)-[:REQUESTED_CONNECTION]->(receiver)
     """)
     void sendConnectionRequest(
             Long senderId,
@@ -38,12 +38,10 @@ public interface PersonRepository
 
     @Query("""
     MATCH (a:User {userId: $userId1})
-    -[r1:CONNECTED_WITH]->
+    -[r1:CONNECTED_WITH]-
     (b:User {userId: $userId2})
 
-    MATCH (b)-[r2:CONNECTED_WITH]->(a)
-
-    DELETE r1, r2
+    DELETE r1
     """)
     void removeConnection(
             Long userId1,
@@ -75,13 +73,13 @@ public interface PersonRepository
     );
 
     @Query("""
-    MATCH path = shortestPath(
+    OPTIONAL MATCH path = shortestPath(
         (a:User {userId: $userId1})
         -[:CONNECTED_WITH*]-
         (b:User {userId: $userId2})
     )
 
-    RETURN length(path)
+    RETURN COALESCE(length(path),-1)
     """)
     Integer shortestPathLength(
             Long userId1,
@@ -90,7 +88,7 @@ public interface PersonRepository
 
     @Query("""
     MATCH (:User {userId: $userId})
-    -[:CONNECTED_WITH]->
+    -[:CONNECTED_WITH]-
     (connection:User)
 
     WHERE connection.userId <> $userId
@@ -114,16 +112,16 @@ public interface PersonRepository
 
     @Query("""
     MATCH (:User {userId: $userId})
-    -[:CONNECTED_WITH]->
+    -[:CONNECTED_WITH]-
     (friend:User)
-    -[:CONNECTED_WITH]->
+    -[:CONNECTED_WITH]-
     (secondDegree:User)
 
     WHERE secondDegree.userId <> $userId
 
     AND NOT EXISTS {
         MATCH (:User {userId: $userId})
-        -[:CONNECTED_WITH]->
+        -[:CONNECTED_WITH]-
         (secondDegree)
     }
 
@@ -135,9 +133,9 @@ public interface PersonRepository
 
     @Query("""
     MATCH (me:User {userId: $userId1})
-    -[:CONNECTED_WITH]->
+    -[:CONNECTED_WITH]-
     (mutual:User)
-    <-[:CONNECTED_WITH]-
+    -[:CONNECTED_WITH]-
     (other:User {userId: $userId2})
 
     RETURN DISTINCT mutual
@@ -151,7 +149,7 @@ public interface PersonRepository
 
     @Query("""
     MATCH (a:User {userId: $userId1})
-    -[:CONNECTED_WITH]->
+    -[:CONNECTED_WITH]-
     (b:User {userId: $userId2})
     
     RETURN COUNT(*) > 0

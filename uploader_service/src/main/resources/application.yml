@@ -13,6 +13,6 @@ eureka:
       defaultZone: http://localhost:8761/eureka
 
 cloudinary:
-  api-key: YOUR_API_KEY
-  cloud-name: YOUR_CLOUD_NAME
-  api-secret: YOUR_API_SECRET
+  api-key: ${API_KEY}
+  cloud-name: ${CLOUD_NAME}
+  api-secret: ${API_SECRET}

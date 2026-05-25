@@ -1,6 +1,7 @@
 package com.codingshuttle.linkedin.user_service.security;
 
 import com.codingshuttle.linkedin.user_service.dto.LoginRequestDto;
+import com.codingshuttle.linkedin.user_service.dto.LoginResponseDto;
 import com.codingshuttle.linkedin.user_service.dto.SignUpRequestDto;
 import com.codingshuttle.linkedin.user_service.dto.UserResponseDto;
 import com.codingshuttle.linkedin.user_service.entity.User;
@@ -48,7 +49,7 @@ public class AuthService {
         return modelMapper.map(savedUser, UserResponseDto.class);
     }
 
-    public String login(LoginRequestDto loginRequestDto) {
+    public LoginResponseDto login(LoginRequestDto loginRequestDto) {
         log.info("Processing login request");
         User user = userRepository.findByEmail(loginRequestDto.getEmail()).orElseThrow(() ->
                 new ResourceNotFoundException("No account found with this email"));
@@ -58,7 +59,7 @@ public class AuthService {
             throw new BadRequestException("Invalid email or password");
         }
         log.info("Login successful. Access token generated");
-        return jwtService.generateAccessToken(user);
+        return new LoginResponseDto(jwtService.generateAccessToken(user));
     }
 
 }
