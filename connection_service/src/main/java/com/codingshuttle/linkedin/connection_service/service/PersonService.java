@@ -11,6 +11,7 @@ import com.codingshuttle.linkedin.connection_service.repository.PersonRepository
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
@@ -25,12 +26,27 @@ public class PersonService {
     private final PersonRepository personRepository;
     private final KafkaTemplate<String, ConnectionRequestSentEvent> connectionRequestKafkaTemplate;
     private final KafkaTemplate<String, ConnectionAcceptedEvent> connectionAcceptedKafkaTemplate;
+    private final ModelMapper modelMapper;
 
     private PersonDto convertToDto(Person person){
+        Long currentUserId = AuthContextHolder.getCurrrentUserId();
+
         PersonDto dto = new PersonDto();
         dto.setId(person.getUserId());
         dto.setName(person.getName());
         dto.setEmail(person.getEmail());
+        dto.setProfileImageUrl(person.getProfileImageUrl());
+
+        if (personRepository.connectionExists(currentUserId, person.getUserId())) {
+            dto.setConnectionStatus("CONNECTED");
+        } else if (personRepository.connectionRequestExists(currentUserId, person.getUserId())) {
+            dto.setConnectionStatus("PENDING");
+        } else if (personRepository.connectionRequestExists(person.getUserId(), currentUserId)) {
+            dto.setConnectionStatus("RECEIVED");
+        } else {
+            dto.setConnectionStatus("CONNECT");
+        }
+
         return dto;
     }
 
@@ -186,5 +202,12 @@ public class PersonService {
                 .accepterName(accepter.getName())
                 .build();
         connectionAcceptedKafkaTemplate.send("connection_accepted_topic", event);
+    }
+
+    public PersonDto getUserById(Long userId) {
+        return personRepository.findByUserId(userId)
+                .map(this::convertToDto)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("User not found"));
     }
 }

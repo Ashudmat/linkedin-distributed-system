@@ -14,3 +14,4 @@ public class PostLiked {
     private Long postId;
     private Long likedByUserId;
 }
+

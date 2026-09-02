@@ -10,6 +10,8 @@ spring:
               uri: lb://USER-SERVICE
               predicates:
                 - Path=/api/v1/users/**
+              filters:
+                - name: AuthenticationFilter
 
             - id: notification-service
               uri: lb://NOTIFICATION-SERVICE
@@ -34,6 +36,11 @@ spring:
               uri: lb://UPLOADER-SERVICE
               predicates:
                 - Path=/api/v1/uploads/**
+
+            - id: chat-service
+              uri: lb:ws://CHAT-SERVICE
+              predicates:
+                - Path=/api/v1/chats/**
 
 server:
   port: 8080

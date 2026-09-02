@@ -34,7 +34,7 @@ public class AuthenticationFilter extends AbstractGatewayFilterFactory<Authentic
             }
 
             final String token = tokenHeader.substring(7);
-            System.out.println(token);
+            //System.out.println(token);
             try {
                 String userId = jwtService.getUserIdFromToken(token);
                 ServerWebExchange mutatedExchange = exchange

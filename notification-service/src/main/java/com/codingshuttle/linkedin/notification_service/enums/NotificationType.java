@@ -5,5 +5,6 @@ public enum NotificationType {
     CONNECTION_ACCEPTED,
     POST_CREATED,
     POST_LIKED,
-    POST_COMMENTED
+    POST_COMMENTED,
+    POST_REPOSTED
 }

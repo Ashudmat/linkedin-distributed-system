@@ -6,6 +6,7 @@ import com.codingshuttle.linkedin.notification_service.service.NotificationServi
 import com.codingshuttle.linkedin.post_service.event.PostCommented;
 import com.codingshuttle.linkedin.post_service.event.PostCreated;
 import com.codingshuttle.linkedin.post_service.event.PostLiked;
+import com.codingshuttle.linkedin.post_service.event.PostReposted;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.annotation.KafkaListener;
@@ -66,5 +67,27 @@ public class PostConsumer {
                 .build();
 
         notificationService.addNotification(notification);
+    }
+
+    @KafkaListener(
+            topics = "post_reposted_topic",
+            groupId = "notification-service"
+    )
+    public void handlePostReposted(PostReposted event) {
+
+        Notification notification =
+                Notification.builder()
+                        .receiverUserId(event.getOwnerUserId())
+                        .actorUserId(event.getRepostedByUserId())
+                        .postId(event.getPostId())
+                        .message(String.format("User with id %d shared your post with their network", event.getRepostedByUserId()))
+                        .type(NotificationType.POST_REPOSTED)
+                        .seen(false)
+                        .build();
+
+
+        notificationService.addNotification(notification);
+
+
     }
 }

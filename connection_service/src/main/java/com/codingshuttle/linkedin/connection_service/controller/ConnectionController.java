@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.CrossOrigin;
 
 import java.util.List;
 
@@ -13,6 +14,7 @@ import java.util.List;
 @Slf4j
 @RequestMapping("/core")
 @RequiredArgsConstructor
+@CrossOrigin(origins = "*")
 public class ConnectionController {
 
     private final PersonService personService;
@@ -70,5 +72,10 @@ public class ConnectionController {
     @GetMapping("/shortest-path/{userId}")
     public ResponseEntity<Integer> shortestPath(@PathVariable Long userId){
         return ResponseEntity.ok(personService.shortestPath(userId));
+    }
+
+    @GetMapping("/{userId}")
+    public ResponseEntity<PersonDto> getUserById(@PathVariable Long userId) {
+        return ResponseEntity.ok(personService.getUserById(userId));
     }
 }

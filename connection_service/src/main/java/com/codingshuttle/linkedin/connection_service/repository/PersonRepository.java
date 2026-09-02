@@ -116,15 +116,27 @@ public interface PersonRepository
     (friend:User)
     -[:CONNECTED_WITH]-
     (secondDegree:User)
-
+    
     WHERE secondDegree.userId <> $userId
-
+    
     AND NOT EXISTS {
         MATCH (:User {userId: $userId})
         -[:CONNECTED_WITH]-
         (secondDegree)
     }
-
+    
+    AND NOT EXISTS {
+        MATCH (:User {userId: $userId})
+        -[:REQUESTED_CONNECTION]->
+        (secondDegree)
+    }
+    
+    AND NOT EXISTS {
+        MATCH (secondDegree)
+        -[:REQUESTED_CONNECTION]->
+        (:User {userId: $userId})
+    }
+    
     RETURN DISTINCT secondDegree
     """)
     List<Person> getSecondDegreeConnections(

@@ -21,4 +21,9 @@ public class KafkaConfig {
     public NewTopic postCommented(){
         return new NewTopic("post_commented_topic", 3, (short) 1);
     }
+
+    @Bean
+    public NewTopic postReposted(){
+        return new NewTopic("post_reposted_topic", 3, (short) 1);
+    }
 }

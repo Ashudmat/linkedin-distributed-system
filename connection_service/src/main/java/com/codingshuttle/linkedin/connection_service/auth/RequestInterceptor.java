@@ -10,10 +10,22 @@ import org.springframework.web.servlet.HandlerInterceptor;
 public class RequestInterceptor implements HandlerInterceptor {
 
     @Override
-    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
+    public boolean preHandle(HttpServletRequest request,
+                             HttpServletResponse response,
+                             Object handler) {
+
+        if ("OPTIONS".equalsIgnoreCase(request.getMethod())) {
+            return true;
+        }
+
         String userId = request.getHeader("X-User-Id");
+
+        if (userId == null || userId.isBlank()) {
+            return true;
+        }
         AuthContextHolder.setCurrrentUserId(Long.valueOf(userId));
-        return HandlerInterceptor.super.preHandle(request, response, handler);
+
+        return true;
     }
 
     @Override

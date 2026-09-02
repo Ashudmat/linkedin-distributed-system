@@ -29,11 +29,20 @@ public class JWTService {
         return Jwts.builder()
                 .subject(user.getId().toString())
                 .claim("email", user.getEmail())
+                .claim("name", user.getName())
+                .claim("profileImageUrl",user.getProfileImageUrl())
                 .issuedAt(new Date())
-                .expiration(new Date(System.currentTimeMillis() + Duration.ofMinutes(10).toMillis()))
+                .expiration(new Date(System.currentTimeMillis() + Duration.ofDays(1).toMillis()))
                 .signWith(getSecretKey())
                 .compact();
     }
 
-
+//    public String extractUserId(String token) {
+//        return Jwts.parser()
+//                .verifyWith(getSecretKey())
+//                .build()
+//                .parseSignedClaims(token)
+//                .getPayload()
+//                .getSubject();
+//    }
 }

@@ -23,7 +23,9 @@ public class ApiResponse<T> {
         this();
         this.data = data;
     }
-
+    public T getData() {
+        return data;
+    }
     public ApiResponse() {
         this.timestamp = LocalDateTime.now();
     }

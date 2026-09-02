@@ -17,11 +17,8 @@ public class PostLike {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
-
     private Long postId;
-
     private Long userId;
-
     @CreationTimestamp
     private LocalDateTime createdAt;
 }

@@ -1,12 +1,8 @@
 package com.codingshuttle.linkedin.user_service.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
-import org.springframework.stereotype.Service;
-
 
 @Entity
 @Table(name = "Users")
@@ -26,4 +22,15 @@ public class User {
 
     @Column(nullable = false)
     private String password;
+
+    private String profileImageUrl;
+
+    private String headline;
+
+    @Column(length = 1200)
+    private String about;
+
+    private String location;
+
+    private String skills;
 }

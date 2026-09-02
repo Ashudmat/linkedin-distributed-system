@@ -10,7 +10,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class PostCommented {
-
     private Long postId;
     private Long commenterUserId;
     private Long ownerUserId;

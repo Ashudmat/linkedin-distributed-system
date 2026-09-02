@@ -11,4 +11,6 @@ public class CommentResponseDto {
     private Long postId;
     private String content;
     private LocalDateTime createdAt;
+    private String authorName;
+    private String authorProfileImageUrl;
 }

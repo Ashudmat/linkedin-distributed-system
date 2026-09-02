@@ -30,6 +30,4 @@ public class JWTService {
                 .getPayload();
         return claims.getSubject();
     }
-
-
 }

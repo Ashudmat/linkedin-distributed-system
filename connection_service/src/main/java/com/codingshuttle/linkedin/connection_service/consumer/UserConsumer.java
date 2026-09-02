@@ -2,6 +2,7 @@ package com.codingshuttle.linkedin.connection_service.consumer;
 
 import com.codingshuttle.linkedin.connection_service.entity.Person;
 import com.codingshuttle.linkedin.connection_service.repository.PersonRepository;
+import com.codingshuttle.linkedin.user_service.event.ProfileImageUpdatedEvent;
 import com.codingshuttle.linkedin.user_service.event.UserCreatedEvent;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -29,5 +30,14 @@ public class UserConsumer {
                 .build();
         personRepository.save(person);
         log.info("Person node created in Neo4j");
+    }
+
+    @KafkaListener(topics = "profile_image_updated_topic", groupId = "connection_service")
+    public void handleProfileImageUpdated(String message) throws JsonProcessingException {
+        ProfileImageUpdatedEvent event = objectMapper.readValue(message, ProfileImageUpdatedEvent.class);
+        Person person = personRepository.findByUserId(event.getUserId()).orElseThrow(() -> new RuntimeException("User not found"));
+        person.setProfileImageUrl(event.getProfileImageUrl());
+        personRepository.save(person);
+        log.info("Profile image updated for userId: {}", event.getUserId());
     }
 }

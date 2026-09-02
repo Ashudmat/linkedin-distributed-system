@@ -4,6 +4,8 @@ package com.codingshuttle.linkedin.post_service.client;
 import com.codingshuttle.linkedin.post_service.advice.ApiResponse;
 import com.codingshuttle.linkedin.post_service.dto.PersonDto;
 import org.springframework.cloud.openfeign.FeignClient;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.ErrorResponse;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
@@ -14,4 +16,7 @@ public interface ConnectionServiceClient {
 
     @GetMapping("/api/v1/connections/core/{userId}/first-degree")
     ApiResponse<List<PersonDto>> getFirstDegreeConnections(@PathVariable Long userId);
+
+    @GetMapping("/api/v1/connections/core/{userId}")
+    ApiResponse<PersonDto> getUserById(@PathVariable Long userId);
 }

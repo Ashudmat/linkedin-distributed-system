@@ -14,9 +14,11 @@ import java.util.List;
 public class NotificationService {
 
     private final NotificationRepository notificationRepository;
+    private final org.springframework.messaging.simp.SimpMessagingTemplate messagingTemplate;
 
     public void addNotification(Notification notification){
-        notificationRepository.save(notification);
+        Notification saved = notificationRepository.save(notification);
+        messagingTemplate.convertAndSend("/topic/notifications/" + saved.getReceiverUserId(), saved);
     }
 
     public void markAsSeen(Long notificationId){

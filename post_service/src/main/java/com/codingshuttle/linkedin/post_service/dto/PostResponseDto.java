@@ -14,4 +14,13 @@ public class PostResponseDto {
     private String authorName;
     private boolean ownPost;
 
+    private long likeCount;
+    private boolean liked;
+
+    private Long repostedPostId;
+
+    private String originalAuthorName;
+    private String originalContent;
+    private String originalMediaUrl;
+    private String authorProfileImageUrl;
 }
